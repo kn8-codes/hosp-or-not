@@ -1,7 +1,7 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import { supabase } from '$lib/supabase.js';
-	import { castVote, hasVoted, tallyVotes } from '$lib/votes.js';
+	import { castVote, hasVoted, tallyVotes, updateVoteBlurb } from '$lib/votes.js';
 	import { closePost } from '$lib/posts.js';
 	import Gauge from '$lib/components/Gauge.svelte';
 
@@ -36,8 +36,8 @@
 		submittingVote = true;
 		voteError = null;
 		try {
-			await castVote(post.id, decision, null);
-			votes = [...votes, { vote: decision, blurb: null, created_at: new Date().toISOString() }];
+			const createdVote = await castVote(post.id, decision, null);
+			votes = [...votes, createdVote];
 			voted = true;
 			showBlurb = true;
 		} catch (e) {
@@ -52,14 +52,8 @@
 			showBlurb = false;
 			return;
 		}
-		await supabase
-			.from('votes')
-			.update({ blurb: blurb.trim() })
-			.eq('post_id', post.id)
-			.order('created_at', { ascending: false })
-			.limit(1);
-		const last = votes[votes.length - 1];
-		votes = [...votes.slice(0, -1), { ...last, blurb: blurb.trim() }];
+		const updatedVote = await updateVoteBlurb(post.id, blurb.trim());
+		votes = votes.map((v) => (v.id === updatedVote.id ? updatedVote : v));
 		showBlurb = false;
 	}
 
@@ -103,7 +97,7 @@
 
 <div class="page">
 	<div class="photo-wrap">
-		<img src={post.photo_url} alt="injury photo" />
+		<img src={post.photo_url} alt="injury" />
 		{#if post.exif_verified}
 			<span class="badge">✓ verified</span>
 		{/if}

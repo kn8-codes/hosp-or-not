@@ -100,6 +100,9 @@
 		<div
 			class="dropzone"
 			class:has-preview={preview}
+			role="button"
+			tabindex="0"
+			aria-label="Upload injury photo"
 			ondrop={onDrop}
 			ondragover={(e) => e.preventDefault()}
 		>

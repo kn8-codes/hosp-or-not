@@ -3,8 +3,8 @@
 
 	let { post } = $props();
 
-	const { yes, no, total } = tallyVotes(post.votes ?? []);
-	const yesPct = total > 0 ? Math.round((yes / total) * 100) : 50;
+	const tally = $derived(tallyVotes(post.votes ?? []));
+	const yesPct = $derived(tally.total > 0 ? Math.round((tally.yes / tally.total) * 100) : 50);
 
 	function timeAgo(dateStr) {
 		const diff = (Date.now() - new Date(dateStr)) / 1000;
@@ -17,7 +17,7 @@
 
 <a href="/post/{post.id}" class="card">
 	<div class="photo">
-		<img src={post.photo_url} alt="injury photo" loading="lazy" />
+		<img src={post.photo_url} alt="injury" loading="lazy" />
 		{#if post.exif_verified}
 			<span class="badge">✓ verified</span>
 		{/if}
@@ -41,7 +41,7 @@
 		</div>
 
 		<div class="meta">
-			<span>{total} vote{total !== 1 ? 's' : ''}</span>
+			<span>{tally.total} vote{tally.total !== 1 ? 's' : ''}</span>
 			<span>{timeAgo(post.created_at)}</span>
 		</div>
 	</div>

@@ -1,7 +1,12 @@
 import { supabase } from './supabase.js';
 
+function requireSupabase() {
+	if (!supabase) throw new Error('Supabase env vars are not configured');
+	return supabase;
+}
+
 export async function getPosts() {
-	const { data, error } = await supabase
+	const { data, error } = await requireSupabase()
 		.from('posts')
 		.select(`
 			id,
@@ -20,7 +25,7 @@ export async function getPosts() {
 }
 
 export async function getPost(id) {
-	const { data, error } = await supabase
+	const { data, error } = await requireSupabase()
 		.from('posts')
 		.select(`
 			*,
@@ -34,20 +39,21 @@ export async function getPost(id) {
 }
 
 export async function createPost({ photoFile, description, exifVerified, exifData }) {
+	const client = requireSupabase();
 	const ext = photoFile.name.split('.').pop();
 	const filename = `${crypto.randomUUID()}.${ext}`;
 
-	const { error: uploadError } = await supabase.storage
+	const { error: uploadError } = await client.storage
 		.from('photos')
 		.upload(filename, photoFile);
 
 	if (uploadError) throw uploadError;
 
-	const { data: { publicUrl } } = supabase.storage
-		.from('photos')
-		.getPublicUrl(filename);
+	const {
+		data: { publicUrl }
+	} = client.storage.from('photos').getPublicUrl(filename);
 
-	const { data, error } = await supabase
+	const { data, error } = await client
 		.from('posts')
 		.insert({
 			photo_url: publicUrl,
@@ -63,7 +69,7 @@ export async function createPost({ photoFile, description, exifVerified, exifDat
 }
 
 export async function closePost(id, outcome) {
-	const { error } = await supabase
+	const { error } = await requireSupabase()
 		.from('posts')
 		.update({
 			status: 'closed',

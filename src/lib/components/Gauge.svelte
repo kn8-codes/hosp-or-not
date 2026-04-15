@@ -12,10 +12,10 @@
 	let needleGroup = $state(null);
 	let hospArc = $state(null);
 	let notArc = $state(null);
-	let displayPct = $state(yesPct);
+	let displayPct = $state(50);
 
 	// Plain object GSAP can tween for the animated counter
-	const pctProxy = { value: yesPct };
+	const pctProxy = { value: 50 };
 	let initialized = false;
 
 	$effect(() => {

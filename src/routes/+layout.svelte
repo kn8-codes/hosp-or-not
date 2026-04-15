@@ -19,6 +19,7 @@
 			<span class="w-hosp">HOSP</span><span class="w-rest"> or Not</span>
 		</a>
 		<nav>
+			<a href="/vote">Vote</a>
 			<a href="/submit">+ Post</a>
 			<a href="/stats">Stats</a>
 		</nav>

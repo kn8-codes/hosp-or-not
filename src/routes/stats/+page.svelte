@@ -1,8 +1,12 @@
 <script>
 	let { data } = $props();
-	const { totalPosts, totalVotes, closedTotal, closedWithOutcome, accuracyPct } = data.stats;
-
-	const avgVotes = totalPosts > 0 ? (totalVotes / totalPosts).toFixed(1) : '—';
+	const stats = $derived(data.stats);
+	const totalPosts = $derived(stats.totalPosts);
+	const totalVotes = $derived(stats.totalVotes);
+	const closedTotal = $derived(stats.closedTotal);
+	const closedWithOutcome = $derived(stats.closedWithOutcome);
+	const accuracyPct = $derived(stats.accuracyPct);
+	const avgVotes = $derived(totalPosts > 0 ? (totalVotes / totalPosts).toFixed(1) : '—');
 </script>
 
 <div class="page">
