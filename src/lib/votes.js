@@ -29,10 +29,20 @@ export function getGuestId() {
 	return guestId;
 }
 
+async function ensureGuestActor(guestId) {
+	const { error } = await requireSupabase().rpc('get_or_create_guest_actor', {
+		p_guest_id: guestId
+	});
+
+	if (error) throw error;
+}
+
 export async function castVote(postId, vote, blurb) {
 	if (hasVoted(postId)) throw new Error('Already voted on this post');
 
 	const guestId = getGuestId();
+	await ensureGuestActor(guestId);
+
 	const { data, error } = await requireSupabase().rpc('submit_vote', {
 		p_post_id: postId,
 		p_vote: vote,
@@ -51,6 +61,8 @@ export async function castVote(postId, vote, blurb) {
 
 export async function updateVoteBlurb(postId, blurb) {
 	const guestId = getGuestId();
+	await ensureGuestActor(guestId);
+
 	const { data, error } = await requireSupabase().rpc('update_vote_blurb', {
 		p_post_id: postId,
 		p_blurb: blurb,
